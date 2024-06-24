@@ -6,7 +6,7 @@ void setup() {
   Mouse.begin();
   delay(100);
   Consumer.releaseAll();
-  BootKeyboard.releaseAll();
+  Keyboard.releaseAll();
   System.releaseAll();
   Mouse.releaseAll();
   delay(50);
@@ -49,7 +49,7 @@ void setup() {
   delayBetweenCheckBusyTimer.attach(delayBetweenCheckBusyFunc);  // для нормалнього сброса таймаута
   inactionDisableBPMTimer.attach(inactionDisableBPM);            // для уменьшения яркости BPM при бездействии
   updateInSleepModeTimer.attach(updateInSleepMode);              // когда в режиме сна
-  dropRxLEDTimer.attach(dropRxLED); 
+  dropRxLEDSleepTimer.attach(dropRxLEDSleep); 
 
   // настроим градиенты
   blueGrad.colors[0] = gradientBackColor1;

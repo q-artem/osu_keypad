@@ -14,7 +14,7 @@
 #define gradientBackColor2 mAqua
 #define gradientBackColor3 mBlue
 #define gradientBackColor4 mNavy
-#define TIMEOUT_TO_DISABLE 1200       // таймаут до отключения подстветки
+#define TIMEOUT_TO_DISABLE 30*60*1000    // таймаут до отключения подстветки
 #define TIME_DISABLING_LIGHT 500         // как долго будет отключаться подстветка
 #define TIME_ENABLING_LIGHT 300          // как долго будет включаться подстветка
 #define TIMEOUT_INACTION_DISABLE_BPM 30  // как долго будет уменьшаться яроксть светодиода BPM при бездействии
@@ -28,7 +28,7 @@
 #define BRIGHT_BACKLIGHT_IN_GAME_MODE 30
 #define BRIGHT_BACKLIGHT_IN_WORK_MODE 80
 // Invisible
-#define LIGHT_CYCLE 15     // частота обновления светодиодов
+#define LIGHT_CYCLE 15     // частота обновления светодиодов 60 герц
 #define MAIN_CYCLE 2       // частота обновления всего, кроме кнопок;   ДЕЛИТЕЛЬ ANTI_SCR!
 #define ANTI_SCR 36        // миллисекунд, таймаут антидребезга;   КРАТНО MAIN_CYCLE!
 #define COL_BUFFER_BPM 10  // величина буфера для подсчёта BPM
@@ -62,16 +62,17 @@ TimerMs lightCycleTimer(LIGHT_CYCLE, 1, 0);
 TimerMs timeoutDisableTimer(TIMEOUT_TO_DISABLE, 1, 1);                // время до выключения подстветки
 TimerMs inactionDisableBPMTimer(TIMEOUT_INACTION_DISABLE_BPM, 1, 0);  // время полного погасания светодиода BPM
 TimerMs upBritnessAfterDisableTimer(1, 0, 0);                         // таймер для асинхронного повышения яркости         (заменить на главный цикл?)
-TimerMs delayBetweenCheckBusyTimer(5000, 1, 0);                       // чтобы сильно часто не дёргать таймер таймаута
+TimerMs delayBetweenCheckBusyTimer(5000, 1, 1);                       // чтобы сильно часто не дёргать таймер таймаута
 TimerMs updateInSleepModeTimer(PERIOD_BREATH_IN_SLEEP / 255, 1, 0);   // когда в режиме сна
-TimerMs dropRxLEDTimer(3500, 0, 1); // сброс некрасивого красного светодиода при отправке компа в сон
+TimerMs dropRxLEDSleepTimer(5000, 0, 1); // сброс некрасивого красного светодиода при отправке компа в сон
 
 // Связь с компом
+#define HID_CUSTOM_LAYOUT
+#define LAYOUT_US_ENGLISH
 #include <HID-Project.h>
 
 // Для перезагрузки на всякий случай
 #include "GyverWDT.h"
-
 
 bool IN_GAME_MODE = 0;
  
@@ -79,8 +80,6 @@ bool IN_GAME_MODE = 0;
 // обработка кнопок
 bool b1_flag = 0;  // флаги для нажатий
 bool b2_flag = 0;
-bool b1_state = 0;  // состояние кнопок
-bool b2_state = 0;
 bool if_click_todo = 0;  // если идёт нажатие
 int anti_scr_led1 = 0;   // для антидребезга
 int anti_scr_led2 = 0;
@@ -90,6 +89,7 @@ bool delay_between_check_busy = 1;  // чтобы сильно часто не �
 int light_led1 = 0;  // яркость светодиода кнопки
 int light_led2 = 0;
 int light_wheel = 1;  // яркость колёсика
+bool last_direction_wheel = 0;  // последнее направление поворота
 
 bool light_on_led1 = 0;  // флаг, нужно включить светодиод один раз при нажатии
 bool light_on_led2 = 0;

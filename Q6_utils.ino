@@ -13,85 +13,13 @@ bool isFirstActionAfterClick() {
   return 0;
 }
 
-
-void update1() {
-  strip.leds[4] = getFade(colorTap1, 255 - light_led1 * BRIGHT_BUTTONS / 255);
-}
-
-void update2() {
-  strip.leds[5] = getFade(colorTap2, 255 - light_led2 * BRIGHT_BUTTONS / 255);
-}
-
-void updateWheel(bool isUp) {
-  if (isUp) {
-    strip.leds[6] = getFade(colorWheelUp, 255 - abs(light_wheel) * BRIGHT_WHEEL / 255);
-  } else {
-    strip.leds[6] = getFade(colorWheelDown, 255 - abs(light_wheel) * BRIGHT_WHEEL / 255);
-  }
-}
-
-uint8_t crt(uint8_t val) {
-  // return ((uint32_t)(val + 1) * (val + 1) * val) >> 16;
-  return pgm_read_byte(&(CRTgamma_PGM[val]));
-}
-
-void changingBackLight() {
-  if (!is_pc_in_sleep) {
-    if (IN_GAME_MODE) {             // если игровой
-      if (state_back_light == 1) {  // если были в рабочем режиме
-        BRIGHT_BACKLIGHT = constrain(BRIGHT_BACKLIGHT - 2, 0, 255);
-        if (BRIGHT_BACKLIGHT == 0) state_back_light = 0;  // понижаем до упора
-      }
-      if (state_back_light == 0 and BRIGHT_BACKLIGHT != 255) {
-        BRIGHT_BACKLIGHT = constrain(BRIGHT_BACKLIGHT + 2, 0, 255); ;  // повышаем до упора
-      }
-    } else {                        // если рабочий
-      if (state_back_light == 0) {  // если были в игровом режиме
-        BRIGHT_BACKLIGHT = constrain(BRIGHT_BACKLIGHT - 2, 0, 255);
-        if (BRIGHT_BACKLIGHT == 0) state_back_light = 1;
-      }
-      if (state_back_light == 1 and BRIGHT_BACKLIGHT != 255) {
-        BRIGHT_BACKLIGHT = constrain(BRIGHT_BACKLIGHT + 2, 0, 255); ;  // повышаем до упора
-      }
-    }
-  }
-}
-
-void updateBackLight() {
-  if (state_back_light == 0) {  // если в игровом состоянии
-    for (int i = 0; i < 4; i++) {
-      // проходим по всей ленте
-      // inoise8 вернёт 0-255
-      // градиент будет брать значение шума, размер градиента 255 (как максимум шума)
-      // i*50 - шаг шума по горизонтали
-      // noise_position - общее движение шума по вертикали
-      strip.leds[i] = getFade(blueGrad.get(inoise8(i * 50, noise_position[i]), 255), 255 - BRIGHT_BACKLIGHT_IN_GAME_MODE * BRIGHT_BACKLIGHT / 255);
-      noise_position[i] += 3;
-    }
-  } else {
-    for (int x = 0; x < 2; x++) {
-      for (int y = 0; y < 2; y++) {
-        // проходим по всей ленте
-        // inoise8 вернёт 0-255
-        // градиент будет брать значение шума, размер градиента 255 (как максимум шума)
-        // i*50 - шаг шума по горизонтали
-        // noise_position - общее движение шума по вертикали
-        strip.leds[!x and y == 0 ? 2 : !x and y ? 3
-                                     : x and y  ? 0
-                                                : 1] = getFade(fireGrad.get(inoise8(x * 50 * 3, y * 40 * 3, noise_position[0]), 255), 255 - BRIGHT_BACKLIGHT_IN_WORK_MODE * BRIGHT_BACKLIGHT / 255);
-        noise_position[0] += 1;
-      }
-    }
-  }
-}
-
-void updateWheelLight(bool direction) {
+void setWheelLight(bool direction) {
   if (direction) {
     if (light_wheel < 0) light_wheel = -light_wheel;
-    light_wheel = min(light_wheel + 50 * (light_wheel == 0 ? 4 : 1), 255);
+    light_wheel = min(light_wheel + 50 * (light_wheel == 0 ? 3 : 1), 255);
   } else {
     if (light_wheel > 0) light_wheel = -light_wheel;
-    light_wheel = max(light_wheel - 50 * (light_wheel == 0 ? 4 : 1), -255);
+    light_wheel = max(light_wheel - 50 * (light_wheel == 0 ? 3 : 1), -255);
   }
 }
 
@@ -110,7 +38,6 @@ void updateInSleepMode() {                                                 // п
 
 
 void delayBetweenCheckBusyFunc() {  // привязана attach к delayBetweenCheckBusyTimer
-  delayBetweenCheckBusyTimer.stop();
   delay_between_check_busy = 1;
 }
 
@@ -124,12 +51,12 @@ void upBritnessAfterDisable() {  // привязана attach к upBritnessAfter
 
 void resetTimeout() {
   timeoutDisableTimer.start();
-  if (is_pc_in_sleep == 0) {
+  if (is_pc_in_sleep == 1) {
     upBritnessAfterDisableTimer.setTime(TIME_ENABLING_LIGHT / 2 / global_britness);
     upBritnessAfterDisableTimer.start();
     upBritnessAfterDisableCounter = 0;
+    is_pc_in_sleep = 0;
   }
-  is_pc_in_sleep = 1;
 }
 
 void disablingLight() {  // привязана attach к timeoutDisableTimer
@@ -147,6 +74,7 @@ void disablingLight() {  // привязана attach к timeoutDisableTimer
 #ifndef USE_STATIC_COLOR_IN_SLEEP
   pc_in_sleep_color = random(0, 256);
 #endif
+delayBetweenCheckBusyTimer.force();  // чтоб можно было сразу проснуться
 }
 
 void cleanBPMBuffer() {
@@ -177,7 +105,7 @@ void updateBPMFlash() {
     if (light_bpm_led) {
       light_bpm_led = max(light_bpm_led - speedDownBPM, 0);
     }
-    strip.leds[7] = getFade(colorBPM, (long)(255 - crt(light_bpm_led) * light_bpm_led_inaction / 255 * BRIGHT_BPM / 255));
+    strip.leds[7] = getFade(colorBPM, (long)(255 - light_bpm_led * light_bpm_led_inaction / 255 * BRIGHT_BPM / 255));
   }
 }
 
@@ -258,11 +186,11 @@ unsigned long findScorePointOnBPM(unsigned long note) {
 }
 
 
-unsigned long updateBPM(unsigned long curr) {
+unsigned long updateBPM() {
   for (int i = 0; i < COL_BUFFER_BPM - 1; i++) {
     bpm[i] = bpm[i + 1];
   }
-  bpm[COL_BUFFER_BPM - 1] = curr;  // сдвинули на 1 и записали текущий новый
+  bpm[COL_BUFFER_BPM - 1] = millis();  // сдвинули на 1 и записали текущий новый
   // пересчёт среднего
   unsigned long average_delta = 0;
   int cntr = 0;
