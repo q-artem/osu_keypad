@@ -14,7 +14,7 @@
 #define gradientBackColor2 mAqua
 #define gradientBackColor3 mBlue
 #define gradientBackColor4 mNavy
-#define TIMEOUT_TO_DISABLE 30*60*1000    // таймаут до отключения подстветки
+#define TIMEOUT_TO_DISABLE 1800000    // таймаут до отключения подстветки
 #define TIME_DISABLING_LIGHT 500         // как долго будет отключаться подстветка
 #define TIME_ENABLING_LIGHT 300          // как долго будет включаться подстветка
 #define TIMEOUT_INACTION_DISABLE_BPM 30  // как долго будет уменьшаться яроксть светодиода BPM при бездействии
@@ -84,6 +84,7 @@ bool if_click_todo = 0;  // если идёт нажатие
 int anti_scr_led1 = 0;   // для антидребезга
 int anti_scr_led2 = 0;
 bool delay_between_check_busy = 1;  // чтобы сильно часто не дёргать таймер таймаута
+bool is_turned_wheel = 0;  // для корректрой обработки мультимедиа команд
 
 // иллюминация
 int light_led1 = 0;  // яркость светодиода кнопки

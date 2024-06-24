@@ -23,6 +23,15 @@ void setup() {
   digitalWrite(4, 0);
   pinMode(3, INPUT_PULLUP);  // входы
   pinMode(5, INPUT_PULLUP);
+  btn_1.setClickTimeout(330);
+  btn_1.setHoldTimeout(300);
+  btn_1.setDebTimeout(34);
+  btn_2.setClickTimeout(330);
+  btn_2.setHoldTimeout(300);
+  btn_2.setDebTimeout(34);
+  btn_1_and_2.setClickTimeout(330);
+  btn_1_and_2.setHoldTimeout(300);
+  btn_1_and_2.setDebTimeout(34);
   // функциональная кнопка
   pinMode(A0, OUTPUT);  // подтяжка
   digitalWrite(A0, 0);
@@ -49,7 +58,7 @@ void setup() {
   delayBetweenCheckBusyTimer.attach(delayBetweenCheckBusyFunc);  // для нормалнього сброса таймаута
   inactionDisableBPMTimer.attach(inactionDisableBPM);            // для уменьшения яркости BPM при бездействии
   updateInSleepModeTimer.attach(updateInSleepMode);              // когда в режиме сна
-  dropRxLEDSleepTimer.attach(dropRxLEDSleep); 
+  dropRxLEDSleepTimer.attach(dropRxLEDSleep);
 
   // настроим градиенты
   blueGrad.colors[0] = gradientBackColor1;

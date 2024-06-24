@@ -34,14 +34,15 @@ void encoderHandler() {
     if (!key_press) {                                                            // кнопки 1 и 2 не нажаты
       for (int q = 1 + 2 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
     } else {                                                                     // если кнопка 1 нажата
-      if (isFirstActionAfterClick()) {                                           // если первый раз - убираем последнюю букву
-        if (btn_1_and_2.pressing()) Keyboard.write(KEY_BACKSPACE);           // и ещё одну, если жмём две
+      if (isFirstActionAfterClick() and IN_GAME_MODE) {                          // если первый раз - убираем последнюю букву
+        if (btn_1_and_2.pressing()) Keyboard.write(KEY_BACKSPACE);               // и ещё одну, если жмём две
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.releaseAll();
       }
       for (int q = 1 + 4 * eb.fast(); q > 0; --q) Consumer.write(key_press);  // если быстро крутим - быстро меняем
     }
     setWheelLight(last_direction_wheel);
+    is_turned_wheel = 1;
   }
 }
 
@@ -58,20 +59,20 @@ void tumblerHandler() {
     // Watchdog.enable(RESET_MODE, WDT_PRESCALER_512);  // серединка - перезагрузка
   }
 }
-void mainKeysHandler() {
+void KeysHandlerInGameMode() {
   if (!b1_flag and !digitalRead(3) and !anti_scr_led1) {
-    Keyboard.press('a');
+    if (IN_GAME_MODE) Keyboard.press('a');
     onPressButton1Actions();
   } else if (b1_flag and digitalRead(3)) {
-    Keyboard.release('a');
+    if (IN_GAME_MODE) Keyboard.release('a');
     onReleaseButton1Actions();
   }
 
   if (!b2_flag and !digitalRead(5) and !anti_scr_led2) {
-    Keyboard.press('s');
+    if (IN_GAME_MODE) Keyboard.press('s');
     onPressButton2Actions();
   } else if (b2_flag and digitalRead(5)) {
-    Keyboard.release('s');
+    if (IN_GAME_MODE) Keyboard.release('s');
     onReleaseButton2Actions();
   }
 }
@@ -81,5 +82,61 @@ void funcButtomHandler() {
     System.write(SYSTEM_SLEEP);
     dropRxLEDSleepTimer.start();  // спать
     Keyboard.press(MOD_LEFT_ALT);
+  }
+}
+
+void mainButtonsHandler() {
+  if (!IN_GAME_MODE) {
+    if (!is_turned_wheel) {
+      if (btn_1.busy()) {
+        if (btn_1.step(0)) {
+          if (btn_1.stepFor(3000)) {
+            Keyboard.write(KEY_LEFT_ARROW);
+          }
+          Keyboard.write(KEY_LEFT_ARROW);
+        }
+        if (btn_1.hasClicks(1)) Consumer.write(MEDIA_PLAY_PAUSE);
+        if (btn_1.hasClicks(2)) Consumer.write(MEDIA_PREVIOUS);
+        if (btn_1.hasClicks(3)) Consumer.write(CONSUMER_CALCULATOR);
+        if (btn_1.hold(1)) Consumer.write(CONSUMER_BROWSER_BACK);
+      }
+
+      if (btn_2.busy()) {
+        if (btn_2.step(0)) {
+          if (btn_2.stepFor(3000)) {
+            Keyboard.write(KEY_RIGHT_ARROW);
+          }
+          Keyboard.write(KEY_RIGHT_ARROW);
+        }
+        if (btn_2.hasClicks(1)) Consumer.write(MEDIA_VOLUME_MUTE);
+        if (btn_2.hasClicks(2)) Consumer.write(MEDIA_NEXT);
+        if (btn_2.hasClicks(3)) Consumer.write(CONSUMER_BROWSER_HOME);
+        if (btn_2.hold(1)) Consumer.write(CONSUMER_BROWSER_FORWARD);
+      }
+      if (btn_1_and_2.busy()) {
+        if (btn_1_and_2.hasClicks(1)) {
+          Keyboard.press(KEY_LEFT_WINDOWS);
+          Keyboard.write(KEY_L);
+          Keyboard.release(KEY_LEFT_WINDOWS);
+        }
+        if (btn_1_and_2.hold(1)) {
+          Keyboard.press(KEY_LEFT_CTRL);
+          Keyboard.press(KEY_LEFT_SHIFT);
+          Keyboard.press(KEY_LEFT_WINDOWS);
+          Keyboard.write(KEY_B);
+          Keyboard.release(KEY_LEFT_SHIFT);
+          Keyboard.release(KEY_LEFT_CTRL);
+          Keyboard.release(KEY_LEFT_WINDOWS);
+        }
+      }
+    }
+  }
+  if (is_turned_wheel) {
+    if (!btn_1.busy() and !btn_2.busy() and !btn_1_and_2.busy()) {
+      is_turned_wheel = 0;
+      btn_1.action();
+      btn_2.action();
+      btn_1_and_2.action();
+    }
   }
 }

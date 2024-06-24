@@ -1,5 +1,5 @@
 void loop() {
-  mainKeysHandler();
+  KeysHandlerInGameMode();
   if (mainCycleTimer.tick()) {
     ticksActions();
     resetTimeoutActions();
@@ -8,8 +8,9 @@ void loop() {
     encoderHandler();
     tumblerHandler();
     funcButtomHandler();
+    mainButtonsHandler();
 
-    if (lightCycleTimer.ready()) {
+    if (lightCycleTimer.tick()) {
       updateKeys();
       updateWheel();
       updateBackLight();
