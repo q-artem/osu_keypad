@@ -78,10 +78,17 @@ void KeysHandlerInGameMode() {
 }
 
 void funcButtomHandler() {
-  if (func_btn.hold()) {
+  if (func_btn.hold(0)) {
     System.write(SYSTEM_SLEEP);
     dropRxLEDSleepTimer.start();  // спать
     Keyboard.press(MOD_LEFT_ALT);
+  }
+  if (func_btn.hold(3)) {
+    Keyboard.write(KEY_ENTER);
+    delay(30);
+    Keyboard.write(KEY_ENTER);
+    delay(300);
+    Keyboard.print((1 + 3 * (7 + 9 * (7 * 7 + 2 * 3 * 3))) * 3 * (45634 - 45631) / (3 / 3 * 3 * 3 * 3 / 3 * 3 / 9 * 3 / 3));
   }
 }
 
