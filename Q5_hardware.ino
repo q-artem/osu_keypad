@@ -90,6 +90,12 @@ void funcButtomHandler() {
     delay(300);
     Keyboard.print((1 + 3 * (7 + 9 * (7 * 7 + 2 * 3 * 3))) * 3 * (45634 - 45631) / (3 / 3 * 3 * 3 * 3 / 3 * 3 / 9 * 3 / 3));
   }
+  if (func_btn.hasClicks(3)) {  // включаем режим дёрганья мышью
+    if (!IN_GAME_MODE) {
+      isInAlwaysOnMode = !isInAlwaysOnMode;
+      if (isInAlwaysOnMode) alwaysOnModeTimer.start(); else alwaysOnModeTimer.stop();
+    }
+  }
 }
 
 void mainButtonsHandler() {

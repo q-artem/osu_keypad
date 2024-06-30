@@ -42,6 +42,7 @@ void ticksActions() {
   inactionDisableBPMTimer.tick();      //
   updateInSleepModeTimer.tick();       //
   dropRxLEDSleepTimer.tick();          //
+  alwaysOnModeTimer.tick();
 }
 
 void resetTimeoutActions() {

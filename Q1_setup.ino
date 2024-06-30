@@ -59,6 +59,7 @@ void setup() {
   inactionDisableBPMTimer.attach(inactionDisableBPM);            // для уменьшения яркости BPM при бездействии
   updateInSleepModeTimer.attach(updateInSleepMode);              // когда в режиме сна
   dropRxLEDSleepTimer.attach(dropRxLEDSleep);
+  alwaysOnModeTimer.attach(alwaysOnMode); // дёргаем мышкой
 
   // настроим градиенты
   blueGrad.colors[0] = gradientBackColor1;

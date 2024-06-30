@@ -1,3 +1,28 @@
+void updateAlwaysOnMode() {
+  if (state_always_on == 1) {     // если включена
+    if (isInAlwaysOnMode == 0) {  // если надо выключить
+      BRIGHT_BPM = constrain(BRIGHT_BPM - LIGHT_CYCLE / 2, 0, 255);
+      if (BRIGHT_BPM == 0) {
+        state_always_on = 0;
+        strip.leds[7] = mBlack;
+        BRIGHT_BPM = 255;
+      }
+    }
+  } else {
+    if (isInAlwaysOnMode == 1) {  // если надо включить
+      if (BRIGHT_BPM == 255) BRIGHT_BPM = 0;
+      BRIGHT_BPM = constrain(BRIGHT_BPM + LIGHT_CYCLE / 2, 0, 255);
+      if (BRIGHT_BPM == 255) {
+        state_always_on = 1;
+      }
+    }
+  }
+  if (isInAlwaysOnMode or state_always_on) {
+    strip.leds[7] = getFade(mWheel8(counter_always_on++), 255 - BRIGHT_LED_IN_ALWAYS_ON_MODE * BRIGHT_BPM / 255);
+  }
+}
+
+
 void updateBackLight() {
   if (!is_pc_in_sleep) {            // для плавной смены режимов
     if (IN_GAME_MODE) {             // если игровой

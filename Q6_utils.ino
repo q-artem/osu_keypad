@@ -109,6 +109,11 @@ void updateBPMFlash() {
   }
 }
 
+void alwaysOnMode() {  // привязана attach к alwaysOnModeTimer
+  Mouse.move(0, 0, 0);
+  resetTimeout();  // не спать
+}
+
 // unsigned long updateBPM(unsigned long curr) {
 //   for (int i = 0; i < 9; i++) {
 //     bpm[i] = bpm[i + 1];

@@ -15,6 +15,7 @@ void loop() {
       updateWheel();
       updateBackLight();
       updateBPMFlash();
+      updateAlwaysOnMode();
       strip.show();  // вывод
     }
   }
