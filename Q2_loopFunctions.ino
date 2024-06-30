@@ -50,8 +50,9 @@ void resetTimeoutActions() {
     if (btn_1.busy() or btn_2.busy() or light_wheel) {  // когда поворачиваем энкодер - light_wheel становится не 0  // это не надо  or func_btn.busy() or tumbler_first_btn.release() or tumbler_second_btn.release()
       resetTimeout();                                   // сброс таймаута
       delay_between_check_busy = 0;
-      delayBetweenCheckBusyTimer.start();      // ждём следующую возможность сбросить таймаут
-      if (is_pc_in_sleep) is_pc_in_sleep = 0;  // выходим из сна
+      delayBetweenCheckBusyTimer.start();          // ждём следующую возможность сбросить таймаут
+      if (is_pc_in_sleep) is_pc_in_sleep = 0;      // выходим из сна
+      if (isInAlwaysOnMode) isInAlwaysOnMode = 0;  // выходимиз режима дёрганья мышью
     }
   }
 }
