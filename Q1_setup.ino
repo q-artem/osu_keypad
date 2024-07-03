@@ -1,7 +1,7 @@
 void setup() {
   // стартуем переферию USB
   Consumer.begin();
-  BootKeyboard.begin();
+  Keyboard.begin();
   System.begin();
   Mouse.begin();
   delay(100);
@@ -10,6 +10,8 @@ void setup() {
   System.releaseAll();
   Mouse.releaseAll();
   delay(50);
+  // инит епрома
+  memory.begin(0, 'q');
   // сериал на максимум
   Serial.begin(2000000);
   Serial.setTimeout(0);
@@ -60,6 +62,7 @@ void setup() {
   updateInSleepModeTimer.attach(updateInSleepMode);              // когда в режиме сна
   dropRxLEDSleepTimer.attach(dropRxLEDSleep);
   alwaysOnModeTimer.attach(alwaysOnMode); // дёргаем мышкой
+  countWorkTimeTimer.attach(countWorkTime);  // считаем время работы
 
   // настроим градиенты
   blueGrad.colors[0] = gradientBackColor1;

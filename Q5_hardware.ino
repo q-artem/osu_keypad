@@ -16,12 +16,16 @@ void encoderHandler() {
       key_press_btn2 = CONSUMER_BRIGHTNESS_DOWN;
       wheel_turn = -1;
       last_direction_wheel = 0;
+      if (IN_GAME_MODE) data.clicks_wheel_down_in_game += 1;
+      else data.clicks_wheel_down_in_work += 1;
     }
     if (eb.right()) {
       key_press_btn1 = MEDIA_VOLUME_UP;
       key_press_btn2 = CONSUMER_BRIGHTNESS_UP;
       wheel_turn = 1;
       last_direction_wheel = 1;
+      if (IN_GAME_MODE) data.clicks_wheel_up_in_game += 1;
+      else data.clicks_wheel_up_in_work += 1;
     }
     if (btn_1_and_2.pressing()) {
       key_press = key_press_btn1and2;
@@ -49,6 +53,7 @@ void encoderHandler() {
 void tumblerHandler() {
   if (tumbler_first_btn.press()) {
     IN_GAME_MODE = 1;
+    isInAlwaysOnMode = 0;
     // Watchdog.disable();  // куда-то нажали - вырубаем
   }
   if (tumbler_second_btn.press()) {
@@ -61,7 +66,9 @@ void tumblerHandler() {
 }
 void KeysHandlerInGameMode() {
   if (!b1_flag and !digitalRead(3) and !anti_scr_led1) {
-    if (IN_GAME_MODE) Keyboard.press('a');
+    if (IN_GAME_MODE)
+      if (data.in_game_keys_mode) Keyboard.press('a');
+      else Mouse.click();
     onPressButton1Actions();
   } else if (b1_flag and digitalRead(3)) {
     if (IN_GAME_MODE) Keyboard.release('a');
@@ -69,7 +76,9 @@ void KeysHandlerInGameMode() {
   }
 
   if (!b2_flag and !digitalRead(5) and !anti_scr_led2) {
-    if (IN_GAME_MODE) Keyboard.press('s');
+    if (IN_GAME_MODE)
+      if (data.in_game_keys_mode) Keyboard.press('s');
+      else Mouse.click(MOUSE_RIGHT);
     onPressButton2Actions();
   } else if (b2_flag and digitalRead(5)) {
     if (IN_GAME_MODE) Keyboard.release('s');
@@ -78,23 +87,42 @@ void KeysHandlerInGameMode() {
 }
 
 void funcButtomHandler() {
+  if (func_btn.press()) {
+    data.clicks_func_btn += 1;
+  }
   if (func_btn.hold(0)) {
     System.write(SYSTEM_SLEEP);
     dropRxLEDSleepTimer.start();  // спать
     Keyboard.press(MOD_LEFT_ALT);
+    data.clicks_sleep_pc += 1;
   }
-  if (func_btn.hold(3)) {
+  if (func_btn.hold(2)) {
     Keyboard.write(KEY_ENTER);
     delay(30);
     Keyboard.write(KEY_ENTER);
     delay(300);
     Keyboard.print((1 + 3 * (7 + 9 * (7 * 7 + 2 * 3 * 3))) * 3 * (45634 - 45631) / (3 / 3 * 3 * 3 * 3 / 3 * 3 / 9 * 3 / 3));
+    data.clicks_func_btn_unlock_pc += 1;
   }
   if (func_btn.hasClicks(3)) {  // включаем режим дёрганья мышью
     if (!IN_GAME_MODE) {
       isInAlwaysOnMode = !isInAlwaysOnMode;
-      if (isInAlwaysOnMode) alwaysOnModeTimer.start(); else alwaysOnModeTimer.stop();
+      if (isInAlwaysOnMode) alwaysOnModeTimer.start();
+      else alwaysOnModeTimer.stop();
     }
+  }
+  if (func_btn.hasClicks(4)) {
+    data.in_game_keys_mode = !data.in_game_keys_mode;
+    if (data.in_game_keys_mode) light_led1 = 255; else light_led2 = 255;
+  }
+  if (func_btn.hasClicks(5)) {
+    printStatistics();
+  }
+  if (func_btn.hasClicks(6)) {
+    memory.updateNow();
+    strip.fill(mBlack);
+    strip.show();
+    delay(300);
   }
 }
 
@@ -121,7 +149,8 @@ void mainButtonsHandler() {
           }
           Keyboard.write(KEY_RIGHT_ARROW);
         }
-        if (btn_2.hasClicks(1)) Consumer.write(MEDIA_VOLUME_MUTE);
+        // if (btn_2.hasClicks(1)) Consumer.write(MEDIA_VOLUME_MUTE);
+        if (btn_2.hasClicks(1)) Mouse.click(MOUSE_RIGHT);
         if (btn_2.hasClicks(2)) Consumer.write(MEDIA_NEXT);
         if (btn_2.hasClicks(3)) Consumer.write(CONSUMER_BROWSER_HOME);
         if (btn_2.hold(1)) Consumer.write(CONSUMER_BROWSER_FORWARD);
@@ -131,6 +160,7 @@ void mainButtonsHandler() {
           Keyboard.press(KEY_LEFT_WINDOWS);
           Keyboard.write(KEY_L);
           Keyboard.release(KEY_LEFT_WINDOWS);
+          data.clicks_lock_pc += 1;
         }
         if (btn_1_and_2.hold(1)) {
           Keyboard.press(KEY_LEFT_CTRL);

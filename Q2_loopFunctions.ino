@@ -3,6 +3,8 @@ void onPressButton1Actions() {
   light_led1 = 255;
   light_on_led1 = 1;
   if_click_todo = 1;
+  if (IN_GAME_MODE) data.clicks_btn1_in_game += 1;
+  else data.clicks_btn1_in_work += 1;
   updateBPMOnClick();
 }
 
@@ -11,6 +13,8 @@ void onPressButton2Actions() {
   light_led2 = 255;
   light_on_led2 = 1;
   if_click_todo = 1;
+  if (IN_GAME_MODE) data.clicks_btn2_in_game += 1;
+  else data.clicks_btn2_in_work += 1;
   updateBPMOnClick();
 }
 
@@ -43,16 +47,24 @@ void ticksActions() {
   updateInSleepModeTimer.tick();       //
   dropRxLEDSleepTimer.tick();          //
   alwaysOnModeTimer.tick();
+  countWorkTimeTimer.tick();
+  // память
+  memory.tick();
 }
 
 void resetTimeoutActions() {
   if (delay_between_check_busy) {
-    if (btn_1.busy() or btn_2.busy() or light_wheel) {  // когда поворачиваем энкодер - light_wheel становится не 0  // это не надо  or func_btn.busy() or tumbler_first_btn.release() or tumbler_second_btn.release()
-      resetTimeout();                                   // сброс таймаута
+    if (btn_1.busy() or btn_2.busy() or func_btn.busy() or light_wheel) {  // когда поворачиваем энкодер - light_wheel становится не 0  // это не надо  or tumbler_first_btn.release() or tumbler_second_btn.release()
+      resetTimeout();                                                      // сброс таймаута
       delay_between_check_busy = 0;
-      delayBetweenCheckBusyTimer.start();          // ждём следующую возможность сбросить таймаут
-      if (is_pc_in_sleep) is_pc_in_sleep = 0;      // выходим из сна
-      if (isInAlwaysOnMode) isInAlwaysOnMode = 0;  // выходимиз режима дёрганья мышью
+      delayBetweenCheckBusyTimer.start();  // ждём следующую возможность сбросить таймаут
+      if (is_pc_in_sleep) {
+        is_pc_in_sleep = 0;  // выходим из сна
+        memory.updateNow();  // если вышли из сна - обновляем сейчас
+      } else {               // иначе отложенно
+        memory.update();     // апдейт памяти
+      }
+      if (isInAlwaysOnMode) isInAlwaysOnMode = 0;  // выходим из режима дёрганья мышью
     }
   }
 }

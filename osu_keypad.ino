@@ -68,6 +68,7 @@ TimerMs delayBetweenCheckBusyTimer(5000, 1, 1);                       // что�
 TimerMs updateInSleepModeTimer(PERIOD_BREATH_IN_SLEEP / 255, 1, 0);   // когда в режиме сна
 TimerMs dropRxLEDSleepTimer(5000, 0, 1);                              // сброс некрасивого красного светодиода при отправке компа в сон
 TimerMs alwaysOnModeTimer(PERIOD_MOUSE_SHAKE, 0, 0);                  // режим дёрганья мышкой
+TimerMs countWorkTimeTimer(60*1000, 1, 0);                  // счётчик времени работы
 
 // Связь с компом
 #define HID_CUSTOM_LAYOUT
@@ -76,6 +77,77 @@ TimerMs alwaysOnModeTimer(PERIOD_MOUSE_SHAKE, 0, 0);                  // реж�
 
 // Для перезагрузки на всякий случай
 #include "GyverWDT.h"
+
+struct Data {
+  uint32_t clicks_btn1_in_game = 0;
+  uint32_t clicks_btn1_in_work = 0;
+  uint32_t clicks_btn2_in_game = 0;
+  uint32_t clicks_btn2_in_work = 0;
+  uint32_t clicks_wheel_down_in_game = 0;
+  uint32_t clicks_wheel_up_in_game = 0;
+  uint32_t clicks_wheel_down_in_work = 0;
+  uint32_t clicks_wheel_up_in_work = 0;
+  
+  uint32_t clicks_func_btn = 0;
+  uint32_t clicks_func_btn_unlock_pc = 0;
+  uint32_t clicks_lock_pc = 0;
+  uint32_t clicks_sleep_pc = 0;
+  uint32_t show_statistics_amount = 0;
+  
+  uint32_t all_work_time = 0;  // в минутах
+  uint32_t all_game_time = 0;
+  uint32_t all_sleep_time = 0;
+  uint32_t all_always_on_mode_time = 0;
+
+  bool in_game_keys_mode = 1;
+
+  bool bool_param_1 = 0;
+  bool bool_param_2 = 0;
+  bool bool_param_3 = 0;
+  bool bool_param_4 = 0;
+  bool bool_param_5 = 0;
+  bool bool_param_6 = 0;
+  bool bool_param_7 = 0;
+  bool bool_param_8 = 0;
+  bool bool_param_9 = 0;
+  bool bool_param_10 = 0;
+
+  byte byte_param_1 = 0;
+  byte byte_param_2 = 0;
+  byte byte_param_3 = 0;
+  byte byte_param_4 = 0;
+  byte byte_param_5 = 0;
+  byte byte_param_6 = 0;
+  byte byte_param_7 = 0;
+  byte byte_param_8 = 0;
+  byte byte_param_9 = 0;
+  byte byte_param_10 = 0;
+
+  int int_param_1 = 0;
+  int int_param_2 = 0;
+  int int_param_3 = 0;
+  int int_param_4 = 0;
+  int int_param_5 = 0;
+  int int_param_6 = 0;
+  int int_param_7 = 0;
+  int int_param_8 = 0;
+  int int_param_9 = 0;
+  int int_param_10 = 0;
+  
+  uint32_t new_param_1 = 0;
+  uint32_t new_param_2 = 0;
+  uint32_t new_param_3 = 0;
+  uint32_t new_param_4 = 0;
+  uint32_t new_param_5 = 0;
+  uint32_t new_param_6 = 0;
+  uint32_t new_param_7 = 0;
+  uint32_t new_param_8 = 0;
+  uint32_t new_param_9 = 0;
+  uint32_t new_param_10 = 0;
+};
+Data data;
+#include <EEManager.h>
+EEManager memory(data, TIMEOUT_TO_DISABLE);
 
 bool IN_GAME_MODE = 0;
 
