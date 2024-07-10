@@ -36,7 +36,9 @@ void encoderHandler() {
     }
     // действия при любом повороте
     if (!key_press) {                                                            // кнопки 1 и 2 не нажаты
-      for (int q = 1 + 2 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
+      // for (int q = 1 + 2 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
+      if (in_scroll_page_mode) wheel_turn > 0 ? Mouse.move(0, -10, 0) : Mouse.move(0, 10, 0);
+      else for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
     } else {                                                                     // если кнопка 1 нажата
       if (isFirstActionAfterClick() and IN_GAME_MODE) {                          // если первый раз - убираем последнюю букву
         if (btn_1_and_2.pressing()) Keyboard.write(KEY_BACKSPACE);               // и ещё одну, если жмём две
@@ -75,12 +77,12 @@ void KeysHandlerInGameMode() {
     onReleaseButton1Actions();
   }
 
-  if (!b2_flag and !digitalRead(5) and !anti_scr_led2) {
+  if (!b2_flag and !digitalRead(2) and !anti_scr_led2) {
     if (IN_GAME_MODE)
       if (data.in_game_keys_mode) Keyboard.press('s');
       else Mouse.click(MOUSE_RIGHT);
     onPressButton2Actions();
-  } else if (b2_flag and digitalRead(5)) {
+  } else if (b2_flag and digitalRead(2)) {
     if (IN_GAME_MODE) Keyboard.release('s');
     onReleaseButton2Actions();
   }
@@ -104,6 +106,18 @@ void funcButtomHandler() {
     Keyboard.print((1 + 3 * (7 + 9 * (7 * 7 + 2 * 3 * 3))) * 3 * (45634 - 45631) / (3 / 3 * 3 * 3 * 3 / 3 * 3 / 9 * 3 / 3));
     data.clicks_func_btn_unlock_pc += 1;
   }
+  if (func_btn.hasClicks(1)) {  // включаем режим прокрутки страницы
+    if (!in_scroll_page_mode) {
+    in_scroll_page_mode = 1;
+    for (int q = 0; q < 16; ++q) Mouse.move(-127, -127, 0);
+    for (int q = 0; q < 5; ++q) Mouse.move(0, 108, 0);
+    for (int q = 0; q < 12; ++q) Mouse.move(120, 0, 0);
+    Mouse.click(MOUSE_MIDDLE);
+    } else { 
+in_scroll_page_mode = 0;
+ Mouse.click(MOUSE_MIDDLE);
+    }
+  }
   if (func_btn.hasClicks(3)) {  // включаем режим дёрганья мышью
     if (!IN_GAME_MODE) {
       isInAlwaysOnMode = !isInAlwaysOnMode;
@@ -113,16 +127,22 @@ void funcButtomHandler() {
   }
   if (func_btn.hasClicks(4)) {
     data.in_game_keys_mode = !data.in_game_keys_mode;
-    if (data.in_game_keys_mode) light_led1 = 255; else light_led2 = 255;
+    if (data.in_game_keys_mode) light_led1 = 255;
+    else light_led2 = 255;
   }
   if (func_btn.hasClicks(5)) {
     printStatistics();
   }
   if (func_btn.hasClicks(6)) {
     memory.updateNow();
-    strip.fill(mBlack);
-    strip.show();
+    offLight();
     delay(300);
+  }
+  if (func_btn.hasClicks(7)) {
+    memory.updateNow();
+    offLight();
+  pinMode(15, OUTPUT);  // перезагружаем
+  digitalWrite(15, 0);
   }
 }
 

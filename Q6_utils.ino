@@ -41,6 +41,11 @@ void delayBetweenCheckBusyFunc() {  // привязана attach к delayBetween
   delay_between_check_busy = 1;
 }
 
+void offLight() {
+  strip.fill(mBlack);
+    strip.show();
+}
+
 void upBritnessAfterDisable() {  // привязана attach к upBritnessAfterDisableTimer
   upBritnessAfterDisableCounter += 2;
   if (global_britness - upBritnessAfterDisableCounter == 1) upBritnessAfterDisableCounter = global_britness;

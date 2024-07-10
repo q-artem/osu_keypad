@@ -29,6 +29,7 @@
 #define USE_FAST_CHANGE_WORK_OR_GAME_MOGE 0  // 1 - использовать более быструю смену режимов, 0 - нет
 #define BRIGHT_BACKLIGHT_IN_GAME_MODE 30
 #define BRIGHT_BACKLIGHT_IN_WORK_MODE 80
+
 // Invisible
 #define LIGHT_CYCLE 15     // частота обновления светодиодов 60 герц
 #define MAIN_CYCLE 2       // частота обновления всего, кроме кнопок;   ДЕЛИТЕЛЬ ANTI_SCR!
@@ -37,7 +38,7 @@
 
 // microLED
 #define CRT_PGM
-#define STRIP_PIN 2  // пин ленты
+#define STRIP_PIN 5  // пин ленты
 #define NUMLEDS 8    // кол-во светодиодов
 #define COLOR_DEBTH 3
 #include <microLED.h>  // подключаем библу
@@ -50,11 +51,11 @@ mGradient<4> fireGrad;
 // Кнопочки и крутилочки
 #include <EncButton.h>
 EncButton eb(7, 8, 11, INPUT_PULLUP);  // колёсико
-Button func_btn(15);                   // функциональная кнопка
-Button tumbler_first_btn(14);          // тумблер
-Button tumbler_second_btn(10);         // тумблер
+Button func_btn(14);                   // функциональная кнопка
+VirtButton tumbler_first_btn;          // тумблер
+VirtButton tumbler_second_btn;         // тумблер
 Button btn_1(3);                       // кнопка 1
-Button btn_2(5);                       // кнопка 2
+Button btn_2(2);                       // кнопка 2
 VirtButton btn_1_and_2;                // одновременное нажатие 1 и 2 кнопок
 
 // Таймеры
@@ -151,7 +152,6 @@ EEManager memory(data, TIMEOUT_TO_DISABLE);
 
 bool IN_GAME_MODE = 0;
 
-
 // обработка кнопок
 bool b1_flag = 0;  // флаги для нажатий
 bool b2_flag = 0;
@@ -160,6 +160,7 @@ int anti_scr_led1 = 0;   // для антидребезга
 int anti_scr_led2 = 0;
 bool delay_between_check_busy = 1;  // чтобы сильно часто не дёргать таймер таймаута
 bool is_turned_wheel = 0;           // для корректрой обработки мультимедиа команд
+bool in_scroll_page_mode = 0;  // для режима прокрутки страницы
 
 // иллюминация
 int light_led1 = 0;  // яркость светодиода кнопки
@@ -183,7 +184,6 @@ byte BRIGHT_BACKLIGHT = 255;
 byte BRIGHT_WHEEL = 255;
 byte BRIGHT_BUTTONS = 255;
 byte BRIGHT_BPM = 255;
-
 
 // рассчёт BPM
 unsigned long bpm[COL_BUFFER_BPM];

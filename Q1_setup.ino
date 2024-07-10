@@ -24,7 +24,8 @@ void setup() {
   pinMode(4, OUTPUT);  // подтяжка
   digitalWrite(4, 0);
   pinMode(3, INPUT_PULLUP);  // входы
-  pinMode(5, INPUT_PULLUP);
+  pinMode(2, INPUT_PULLUP);
+  pinMode(14, INPUT_PULLUP);
   btn_1.setClickTimeout(330);
   btn_1.setHoldTimeout(300);
   btn_1.setDebTimeout(34);
@@ -41,11 +42,11 @@ void setup() {
   pinMode(16, OUTPUT);  // подтяжка
   digitalWrite(16, 0);
   pinMode(10, INPUT_PULLUP);  // входы
-  pinMode(14, INPUT_PULLUP);
   // колёсико
   pinMode(6, OUTPUT);  // подтяжка
   digitalWrite(6, 0);
   eb.setEncType(EB_STEP2);  // настроим тип
+  eb.setEncReverse(1);
   delay(10);                // чуть подождём
 
   if (digitalRead(10)) {  // обновим текущий режим

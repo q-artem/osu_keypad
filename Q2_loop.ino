@@ -1,4 +1,9 @@
 void loop() {
+  // Serial.print(analogRead(A1));
+  // Serial.print(" ");
+  // Serial.print(analogRead(A2));  // photores
+  // Serial.print(" ");
+  // Serial.print(analogRead(A3));  // pir
   KeysHandlerInGameMode();
   if (mainCycleTimer.tick()) {
     ticksActions();

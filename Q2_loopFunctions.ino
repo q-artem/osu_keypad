@@ -32,8 +32,8 @@ void ticksActions() {
   // кнпоки-крутилки
   // eb.tick();  // оправшивается в encoderHandler
   func_btn.tick();            //
-  tumbler_first_btn.tick();   //
-  tumbler_second_btn.tick();  //
+  tumbler_first_btn.tick(digitalRead(10));   //
+  tumbler_second_btn.tick(!digitalRead(10));  //
   btn_1.tick();
   btn_2.tick();
   btn_1_and_2.tick(btn_1, btn_2);
