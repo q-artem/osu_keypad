@@ -11,7 +11,7 @@ void encoderHandler() {
     uint16_t key_press_btn1and2 = 1;
     uint16_t key_press = 0;
     int8_t wheel_turn = 0;
-    if (eb.left()) {  // повернули влево
+    if (eb.right()) {  // повернули влево
       key_press_btn1 = MEDIA_VOLUME_DOWN;
       key_press_btn2 = CONSUMER_BRIGHTNESS_DOWN;
       wheel_turn = -1;
@@ -19,7 +19,7 @@ void encoderHandler() {
       if (IN_GAME_MODE) data.clicks_wheel_down_in_game += 1;
       else data.clicks_wheel_down_in_work += 1;
     }
-    if (eb.right()) {
+    if (eb.left()) {
       key_press_btn1 = MEDIA_VOLUME_UP;
       key_press_btn2 = CONSUMER_BRIGHTNESS_UP;
       wheel_turn = 1;
@@ -29,23 +29,36 @@ void encoderHandler() {
     }
     if (btn_1_and_2.pressing()) {
       key_press = key_press_btn1and2;
+      Keyboard.press(KEY_LEFT_CTRL);
     } else if (btn_1.pressing()) {
       key_press = key_press_btn1;
     } else if (btn_2.pressing()) {
       key_press = key_press_btn2;
     }
     // действия при любом повороте
-    if (!key_press) {                                                            // кнопки 1 и 2 не нажаты
-      // for (int q = 1 + 2 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
-      if (in_scroll_page_mode) wheel_turn > 0 ? Mouse.move(0, -10, 0) : Mouse.move(0, 10, 0);
-      else for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
-    } else {                                                                     // если кнопка 1 нажата
-      if (isFirstActionAfterClick() and IN_GAME_MODE) {                          // если первый раз - убираем последнюю букву
-        if (btn_1_and_2.pressing()) Keyboard.write(KEY_BACKSPACE);               // и ещё одну, если жмём две
+    if (!key_press) {  // кнопки 1 и 2 не нажаты
+                       // for (int q = 1 + 2 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
+      if (in_scroll_page_mode) {
+        bool is_update_prev = 0;
+        if (((wheel_turn < 0) != (curr_speed_scroll < 0)) and (curr_speed_scroll != 0)) {
+          is_update_prev = 1;
+        }
+
+        if (is_update_prev) curr_speed_scroll += wheel_turn;
+        if (!curr_speed_scroll) Mouse.move(0, -wheel_turn * MIN_COL_PIXELS_TO_SCROLL, 0);  // если 0
+        else Mouse.move(0, -wheel_turn*abs(curr_speed_scroll), 0);
+        if (!is_update_prev) curr_speed_scroll += wheel_turn;
+      } else for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
+    } else {                                                                       // если кнопка 1 нажата
+      if (isFirstActionAfterClick() and IN_GAME_MODE and data.in_game_keys_mode) {                            // если первый раз - убираем последнюю букву
+        if (btn_1_and_2.pressing()) Keyboard.write(KEY_BACKSPACE);                 // и ещё одну, если жмём две
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.releaseAll();
       }
-      for (int q = 1 + 4 * eb.fast(); q > 0; --q) Consumer.write(key_press);  // если быстро крутим - быстро меняем
+      for (int q = 1 + 1 * eb.fast(); q > 0; --q) {
+        if (key_press != 1) Consumer.write(key_press);  // если быстро крутим - быстро меняем
+        else {for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);}
+      }
     }
     setWheelLight(last_direction_wheel);
     is_turned_wheel = 1;
@@ -66,6 +79,7 @@ void tumblerHandler() {
     // Watchdog.enable(RESET_MODE, WDT_PRESCALER_512);  // серединка - перезагрузка
   }
 }
+
 void KeysHandlerInGameMode() {
   if (!b1_flag and !digitalRead(3) and !anti_scr_led1) {
     if (IN_GAME_MODE)
@@ -108,14 +122,14 @@ void funcButtomHandler() {
   }
   if (func_btn.hasClicks(1)) {  // включаем режим прокрутки страницы
     if (!in_scroll_page_mode) {
-    in_scroll_page_mode = 1;
-    for (int q = 0; q < 16; ++q) Mouse.move(-127, -127, 0);
-    for (int q = 0; q < 5; ++q) Mouse.move(0, 108, 0);
-    for (int q = 0; q < 12; ++q) Mouse.move(120, 0, 0);
-    Mouse.click(MOUSE_MIDDLE);
-    } else { 
-in_scroll_page_mode = 0;
- Mouse.click(MOUSE_MIDDLE);
+      in_scroll_page_mode = 1;
+      curr_speed_scroll = 0;
+        moveMouse(-4500, -4500);
+        moveMouse(1700, 540);
+      Mouse.click(MOUSE_MIDDLE);
+    } else {
+      in_scroll_page_mode = 0;
+      Mouse.click(MOUSE_MIDDLE);
     }
   }
   if (func_btn.hasClicks(3)) {  // включаем режим дёрганья мышью
@@ -141,8 +155,8 @@ in_scroll_page_mode = 0;
   if (func_btn.hasClicks(7)) {
     memory.updateNow();
     offLight();
-  pinMode(15, OUTPUT);  // перезагружаем
-  digitalWrite(15, 0);
+    pinMode(15, OUTPUT);  // перезагружаем
+    digitalWrite(15, 0);
   }
 }
 
@@ -200,6 +214,17 @@ void mainButtonsHandler() {
       btn_1.action();
       btn_2.action();
       btn_1_and_2.action();
+      Keyboard.release(KEY_LEFT_CTRL);
+    }
+  }
+}
+
+void PIRHandler() {
+  if (enablePIR) {
+    if (digitalRead(A3)) {
+      light_wheel = 255;  // вышли из сна
+      enablePIR = 0;
+      Mouse.move(0, 0, 0);  // пнули комп
     }
   }
 }

@@ -48,6 +48,7 @@ void ticksActions() {
   dropRxLEDSleepTimer.tick();          //
   alwaysOnModeTimer.tick();
   countWorkTimeTimer.tick();
+  timeoutEnablePIRTimer.tick();
   // память
   memory.tick();
 }

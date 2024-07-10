@@ -48,6 +48,10 @@ void setup() {
   eb.setEncType(EB_STEP2);  // настроим тип
   eb.setEncReverse(1);
   delay(10);                // чуть подождём
+  // PIR
+  pinMode(A3, INPUT);  // входы
+  // фоторезистор
+  pinMode(A2, INPUT);  // входы
 
   if (digitalRead(10)) {  // обновим текущий режим
     IN_GAME_MODE = 1;
@@ -64,6 +68,7 @@ void setup() {
   dropRxLEDSleepTimer.attach(dropRxLEDSleep);
   alwaysOnModeTimer.attach(alwaysOnMode); // дёргаем мышкой
   countWorkTimeTimer.attach(countWorkTime);  // считаем время работы
+  timeoutEnablePIRTimer.attach(timeoutEnablePIR);
 
   // настроим градиенты
   blueGrad.colors[0] = gradientBackColor1;

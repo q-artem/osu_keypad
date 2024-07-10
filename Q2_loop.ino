@@ -3,7 +3,7 @@ void loop() {
   // Serial.print(" ");
   // Serial.print(analogRead(A2));  // photores
   // Serial.print(" ");
-  // Serial.print(analogRead(A3));  // pir
+  // Serial.println(digitalRead(A3));  // pir
   KeysHandlerInGameMode();
   if (mainCycleTimer.tick()) {
     ticksActions();
@@ -14,6 +14,7 @@ void loop() {
     tumblerHandler();
     funcButtomHandler();
     mainButtonsHandler();
+    PIRHandler();
 
     if (lightCycleTimer.tick()) {
       updateKeys();

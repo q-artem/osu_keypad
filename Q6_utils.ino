@@ -43,7 +43,7 @@ void delayBetweenCheckBusyFunc() {  // привязана attach к delayBetween
 
 void offLight() {
   strip.fill(mBlack);
-    strip.show();
+  strip.show();
 }
 
 void upBritnessAfterDisable() {  // привязана attach к upBritnessAfterDisableTimer
@@ -80,6 +80,7 @@ void disablingLight() {  // привязана attach к timeoutDisableTimer
   pc_in_sleep_color = random(0, 256);
 #endif
   delayBetweenCheckBusyTimer.force();  // чтоб можно было сразу проснуться
+  timeoutEnablePIRTimer.start();  // таймер на включение ПИР
 }
 
 void cleanBPMBuffer() {
@@ -136,6 +137,10 @@ void alwaysOnMode() {  // привязана attach к alwaysOnModeTimer
   resetTimeout();  // не спать
 }
 
+void timeoutEnablePIR() {  // привязана attach к timeoutEnablePIRTimer
+  enablePIR = 1;
+}
+
 void printStatistics() {
   data.show_statistics_amount += 1;
   Keyboard.press(KEY_LEFT_SHIFT);
@@ -172,109 +177,140 @@ void printStatistics() {
   Serial.println(data.all_game_time);
   Serial.println(data.all_sleep_time);
   Serial.println(data.all_always_on_mode_time);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("     OOOOOOOOO       sssssssssss"));
- delay(6500);
-Keyboard.print(F(" / ___ \\              | |  / )             (_____ \\          | |\n"));
- delay(650);
-Keyboard.print(F("| |   | | ____  _   _ | | / /  ____  _   _  _____) )____   _ | |\n"));
- delay(650);
-Keyboard.print(F("| |   | |/ ___|| | | || |< <  / _  )| | | ||  ____// _  | / || |\n"));
- delay(650);
-Keyboard.print(F("| |___| |\\___ \\| |_| || | \\ \\( (/ / | |_| || |    ( ( | |( (_| |\n"));
- delay(650);
-Keyboard.print(F(" \\_____/ |____/ \\____||_|  \\_)\____) \\__  ||_|     \\_||_| \\____|\n"));
- delay(650);
-Keyboard.print(F("                                    (____/                      \n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("                          Staticstics\n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
- delay(650);
-Keyboard.print(F("|    Значение\режим     | GAME MODE  | WORK MODE  |    ALL     |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
- delay(650);
-Keyboard.print(F("| Кнопка 1, кликов      |            |            |            |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
- delay(650);
-Keyboard.print(F("| Кнопка 2, кликов      |            |            |            |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
- delay(650);
-Keyboard.print(F("| Функц. кнопка, кликов | ========== | ========== |            |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
- delay(650);
-Keyboard.print(F("| Колёсико, тиков вниз  |            |            |            |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
- delay(650);
-Keyboard.print(F("| Колёсико, тиков вверх |            |            |            |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("|------------------------+------------|\n"));
- delay(650);
-Keyboard.print(F("|        Значение        | Количество |\n"));
- delay(650);
-Keyboard.print(F("|------------------------+------------|\n"));
- delay(650);
-Keyboard.print(F("| Разблокировок ПК, раз  |            |\n"));
- delay(650);
-Keyboard.print(F("| Блокировок ПК, раз     |            |\n"));
- delay(650);
-Keyboard.print(F("| Отправок ПК в сон, раз |            |\n"));
- delay(650);
-Keyboard.print(F("| Выводов стат., раз     |            |\n"));
- delay(650);
-Keyboard.print(F("|------------------------+------------|\n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("                        Время работы\n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("|-----------------------------+-----------------------------|\n"));
- delay(650);
-Keyboard.print(F("|            Режим            |         Время работы        |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------------+-----------------------------|\n"));
- delay(650);
-Keyboard.print(F("| GAME MODE                   |                             |\n"));
- delay(650);
-Keyboard.print(F("| WORK MODE                   |                             |\n"));
- delay(650);
-Keyboard.print(F("| Режим ожидания              |                             |\n"));
- delay(650);
-Keyboard.print(F("| Режим поддержания работы ПК |                             |\n"));
- delay(650);
-Keyboard.print(F("| Текущий сеанс               |                             |\n"));
- delay(650);
-Keyboard.print(F("|-----------------------------+-----------------------------|\n"));
- delay(650);
-Keyboard.print(F("\n"));
- delay(650);
-Keyboard.print(F("                                                 G-take Corp. 2024\n"));
- delay(650);
-Keyboard.print(F("\n"));
+  Keyboard.print(F("\n"));
+  delay(650);
+  Keyboard.print(F("\n"));
+  delay(650);
+  Keyboard.print(F("     OOOOOOOOO       sssssssssss"));
+  delay(6500);
+  Keyboard.print(F(" / ___ \\              | |  / )             (_____ \\          | |\n"));
+  delay(650);
+  Keyboard.print(F("| |   | | ____  _   _ | | / /  ____  _   _  _____) )____   _ | |\n"));
+  delay(650);
+  Keyboard.print(F("| |   | |/ ___|| | | || |< <  / _  )| | | ||  ____// _  | / || |\n"));
+  delay(650);
+  Keyboard.print(F("| |___| |\\___ \\| |_| || | \\ \\( (/ / | |_| || |    ( ( | |( (_| |\n"));
+  delay(650);
+  Keyboard.print(F(" \\_____/ |____/ \\____||_|  \\_)\____) \\__  ||_|     \\_||_| \\____|\n"));
+  delay(650);
+  Keyboard.print(F("                                    (____/                      \n"));
+  delay(650);
+  Keyboard.print(F("\n"));
+  delay(650);
+  Keyboard.print(F("\n"));
+  delay(650);
+  Keyboard.print(F("                          Staticstics\n"));
+  delay(650);
+  Keyboard.print(F("\n"));
+  delay(650);
+  Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("|    Значение\режим     | GAME MODE  | WORK MODE  |    ALL     |\n"));
+  delay(650);
+  Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("| Кнопка 1, кликов      |            |            |            |\n"));
+  delay(650);
+  Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("| Кнопка 2, кликов      |            |            |            |\n"));
+  delay(650);
+  Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("| Функц. кнопка, кликов | ========== | ========== |            |\n"));
+  delay(650);
+  Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("| Колёсико, тиков вниз  |            |            |            |\n"));
+  delay(650);
+  Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("| Колёсико, тиков вверх |            |            |            |\n"));
+  delay(650);
+  Keyboard.print(F("|-----------------------+------------+------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("\n"));
+  delay(650);
+  Keyboard.print(F("|------------------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("|        Значение        | Количество |\n"));
+  delay(650);
+  Keyboard.print(F("|------------------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("| Разблокировок ПК, раз  |            |\n"));
+  delay(650);
+  Keyboard.print(F("| Блокировок ПК, раз     |            |\n"));
+  delay(650);
+  Keyboard.print(F("| Отправок ПК в сон, раз |            |\n"));
+  delay(650);
+  Keyboard.print(F("| Выводов стат., раз     |            |\n"));
+  delay(650);
+  Keyboard.print(F("|------------------------+------------|\n"));
+  delay(650);
+  Keyboard.print(F("\n"));
+  delay(650);
+  Keyboard.print(F("                        Время работы\n"));
+  delay(650);
+  Keyboard.print(F("\n"));
+  delay(650);
+  // Keyboard.print(F("|-----------------------------+-----------------------------|\n"));
+  //  delay(650);
+  // Keyboard.print(F("|            Режим            |         Время работы        |\n"));
+  //  delay(650);
+  // Keyboard.print(F("|-----------------------------+-----------------------------|\n"));
+  //  delay(650);
+  // Keyboard.print(F("| GAME MODE                   |                             |\n"));
+  //  delay(650);
+  // Keyboard.print(F("| WORK MODE                   |                             |\n"));
+  //  delay(650);
+  // Keyboard.print(F("| Режим ожидания              |                             |\n"));
+  //  delay(650);
+  // Keyboard.print(F("| Режим поддержания работы ПК |                             |\n"));
+  //  delay(650);
+  // Keyboard.print(F("| Текущий сеанс               |                             |\n"));
+  //  delay(650);
+  // Keyboard.print(F("|-----------------------------+-----------------------------|\n"));
+  //  delay(650);
+  // Keyboard.print(F("\n"));
+  //  delay(650);
+  // Keyboard.print(F("                                                 G-take Corp. 2024\n"));
+  //  delay(650);
+  // Keyboard.print(F("\n"));
 }
 
 void enterDigit() {
-  
+}
+
+void moveMouse(int dist_x, int dist_y) {
+  char reverse_x = 1;
+  char reverse_y = 1;
+  if (dist_x < 0) {
+    reverse_x = -1;
+    dist_x = -dist_x;
+  }
+  if (dist_y < 0) {
+    reverse_y = -1;
+    dist_y = -dist_y;
+  }
+  while (dist_x != 0 or dist_y != 0) {
+    char cr_x = 0;
+    char cr_y = 0;
+    if (dist_x > 120) {
+      cr_x = 120;
+      dist_x -= 120;
+    } else {
+      cr_x = dist_x;
+      dist_x = 0;
+    }
+    if (dist_y > 120) {
+      cr_y = 120;
+      dist_y -= 120;
+    } else {
+      cr_y = dist_y;
+      dist_y = 0;
+    }
+    Mouse.move(reverse_x * cr_x, reverse_y * cr_y, 0);
+  }
 }
 
 // unsigned long updateBPM(unsigned long curr) {

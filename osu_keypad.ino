@@ -35,6 +35,7 @@
 #define MAIN_CYCLE 2       // частота обновления всего, кроме кнопок;   ДЕЛИТЕЛЬ ANTI_SCR!
 #define ANTI_SCR 36        // миллисекунд, таймаут антидребезга;   КРАТНО MAIN_CYCLE!
 #define COL_BUFFER_BPM 10  // величина буфера для подсчёта BPM
+#define MIN_COL_PIXELS_TO_SCROLL 13
 
 // microLED
 #define CRT_PGM
@@ -70,6 +71,7 @@ TimerMs updateInSleepModeTimer(PERIOD_BREATH_IN_SLEEP / 255, 1, 0);   // ког�
 TimerMs dropRxLEDSleepTimer(5000, 0, 1);                              // сброс некрасивого красного светодиода при отправке компа в сон
 TimerMs alwaysOnModeTimer(PERIOD_MOUSE_SHAKE, 0, 0);                  // режим дёрганья мышкой
 TimerMs countWorkTimeTimer(60*1000, 1, 0);                  // счётчик времени работы
+TimerMs timeoutEnablePIRTimer(10*60*1000, 0, 1);               
 
 // Связь с компом
 #define HID_CUSTOM_LAYOUT
@@ -160,7 +162,11 @@ int anti_scr_led1 = 0;   // для антидребезга
 int anti_scr_led2 = 0;
 bool delay_between_check_busy = 1;  // чтобы сильно часто не дёргать таймер таймаута
 bool is_turned_wheel = 0;           // для корректрой обработки мультимедиа команд
+
+// остальное
 bool in_scroll_page_mode = 0;  // для режима прокрутки страницы
+char curr_speed_scroll = 0;
+bool enablePIR = 0;
 
 // иллюминация
 int light_led1 = 0;  // яркость светодиода кнопки
