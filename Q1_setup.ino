@@ -1,4 +1,6 @@
 void setup() {
+  // разрешаем прерывания
+  interrupts();
   // стартуем переферию USB
   Consumer.begin();
   Keyboard.begin();
@@ -20,6 +22,9 @@ void setup() {
   randomSeed(analogRead(0) + analogRead(1) + analogRead(2) + analogRead(3) + analogRead(4));  // максимальная случайность
 
   // основные кнопки-крутилки
+  // прерывания для основных кнопок
+  attachInterrupt(0, interruptButton1Handler, CHANGE);  // кнопка 1 (пин 3, прерывание INT0)
+  attachInterrupt(1, interruptButton2Handler, CHANGE);  // кнопка 2 (пин 2, прерывание INT1)
   // основные кнопки
   pinMode(4, OUTPUT);  // подтяжка
   digitalWrite(4, 0);
@@ -59,7 +64,8 @@ void setup() {
     IN_GAME_MODE = 0;
   }
 
-  strip.setBrightness(global_britness);                          // яркость ленты
+  strip.setBrightness(255);                          // яркость ленты
+
   timeoutDisableTimer.attach(disablingLight);                    // подключим к таймеру функцию отключения
   upBritnessAfterDisableTimer.attach(upBritnessAfterDisable);    // для асинхронного включения
   delayBetweenCheckBusyTimer.attach(delayBetweenCheckBusyFunc);  // для нормалнього сброса таймаута

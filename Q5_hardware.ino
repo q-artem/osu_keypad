@@ -46,18 +46,21 @@ void encoderHandler() {
 
         if (is_update_prev) curr_speed_scroll += wheel_turn;
         if (!curr_speed_scroll) Mouse.move(0, -wheel_turn * MIN_COL_PIXELS_TO_SCROLL, 0);  // если 0
-        else Mouse.move(0, -wheel_turn*abs(curr_speed_scroll), 0);
+        else Mouse.move(0, -wheel_turn * abs(curr_speed_scroll), 0);
         if (!is_update_prev) curr_speed_scroll += wheel_turn;
-      } else for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);  // крутим колесо
-    } else {                                                                       // если кнопка 1 нажата
-      if (isFirstActionAfterClick() and IN_GAME_MODE and data.in_game_keys_mode) {                            // если первый раз - убираем последнюю букву
-        if (btn_1_and_2.pressing()) Keyboard.write(KEY_BACKSPACE);                 // и ещё одну, если жмём две
+      } else
+        for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);   // крутим колесо
+    } else {                                                                        // если кнопка 1 нажата
+      if (isFirstActionAfterClick() and IN_GAME_MODE and data.in_game_keys_mode) {  // если первый раз - убираем последнюю букву
+        if (btn_1_and_2.pressing()) Keyboard.write(KEY_BACKSPACE);                  // и ещё одну, если жмём две
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.releaseAll();
       }
       for (int q = 1 + 1 * eb.fast(); q > 0; --q) {
         if (key_press != 1) Consumer.write(key_press);  // если быстро крутим - быстро меняем
-        else {for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);}
+        else {
+          for (int q = 1 + 1 * eb.fast(); q > 0; --q) Mouse.move(0, 0, wheel_turn);
+        }
       }
     }
     setWheelLight(last_direction_wheel);
@@ -81,24 +84,53 @@ void tumblerHandler() {
 }
 
 void KeysHandlerInGameMode() {
-  if (!b1_flag and !digitalRead(3) and !anti_scr_led1) {
-    if (IN_GAME_MODE)
-      if (data.in_game_keys_mode) Keyboard.press('a');
-      else Mouse.click();
+  if (onPressButton1InInterruptFlag) {
+    onPressButton1InInterruptFlag = 0;
     onPressButton1Actions();
-  } else if (b1_flag and digitalRead(3)) {
-    if (IN_GAME_MODE) Keyboard.release('a');
+  }
+  if (onReleaseButton1InInterruptFlag) {
+    onReleaseButton1InInterruptFlag = 0;
     onReleaseButton1Actions();
   }
-
-  if (!b2_flag and !digitalRead(2) and !anti_scr_led2) {
-    if (IN_GAME_MODE)
-      if (data.in_game_keys_mode) Keyboard.press('s');
-      else Mouse.click(MOUSE_RIGHT);
+  if (onPressButton2InInterruptFlag) {
+    onPressButton2InInterruptFlag = 0;
     onPressButton2Actions();
-  } else if (b2_flag and digitalRead(2)) {
-    if (IN_GAME_MODE) Keyboard.release('s');
+  }
+  if (onReleaseButton2InInterruptFlag) {
+    onReleaseButton2InInterruptFlag = 0;
     onReleaseButton2Actions();
+  }
+}
+
+void interruptButton1Handler() {
+  if (!b1_flag and !digitalRead(3) and !anti_scr_led1) {
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.press('a');
+      else Mouse.press(MOUSE_LEFT);
+    }
+    onPressButton1InInterruptFlag = 1;
+  } else if (b1_flag and digitalRead(3)) {
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.release('a');
+      else Mouse.release(MOUSE_LEFT);
+    }
+    onReleaseButton1InInterruptFlag = 1;
+  }
+}
+
+void interruptButton2Handler() {
+  if (!b2_flag and !digitalRead(2) and !anti_scr_led2) {
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.press('s');
+      else Mouse.press(MOUSE_RIGHT);
+    }
+    onPressButton2InInterruptFlag = 1;
+  } else if (b2_flag and digitalRead(2)) {
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.release('s');
+      else Mouse.release(MOUSE_RIGHT);
+    }
+    onReleaseButton2InInterruptFlag = 1;
   }
 }
 
@@ -124,8 +156,8 @@ void funcButtomHandler() {
     if (!in_scroll_page_mode) {
       in_scroll_page_mode = 1;
       curr_speed_scroll = 0;
-        moveMouse(-4500, -4500);
-        moveMouse(1700, 540);
+      moveMouse(-4500, -4500);
+      moveMouse(1700, 540);
       Mouse.click(MOUSE_MIDDLE);
     } else {
       in_scroll_page_mode = 0;

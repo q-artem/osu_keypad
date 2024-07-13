@@ -14,7 +14,8 @@
 #define gradientBackColor2 mAqua
 #define gradientBackColor3 mBlue
 #define gradientBackColor4 mNavy
-#define TIMEOUT_TO_DISABLE 3600000       // таймаут до отключения подстветки
+#define TIMEOUT_TO_DISABLE 60*60*1000L             // таймаут до отключения подстветки
+#define TIMEOUT_TO_ENABLE_PIR 60*10*1000L       // таймаут до активации включения по движению, после уходв в сон или выкючения по тайауту
 #define TIME_DISABLING_LIGHT 500         // как долго будет отключаться подстветка
 #define TIME_ENABLING_LIGHT 300          // как долго будет включаться подстветка
 #define TIMEOUT_INACTION_DISABLE_BPM 30  // как долго будет уменьшаться яроксть светодиода BPM при бездействии
@@ -22,13 +23,17 @@
 #define BRIGHT_BREATH_IN_SLEEP 30        // разница между максимальной и минимальной яркостью эффекта дыхания когда комп во сне
 #define MIN_BRIGHT_BREATH_IN_SLEEP 3     // минимальная яркость эффекта дыхания когда комп во сне
 #define COLOR_BREATH_IN_SLEEP mGreen     // цвет эффекта дыхания когда комп во сне
-#define PERIOD_MOUSE_SHAKE 30000         // период дёрганья мыши
+#define PERIOD_MOUSE_SHAKE 30000L         // период дёрганья мыши
 #define BRIGHT_LED_IN_ALWAYS_ON_MODE  170  // яркость в режиме дёрганья мышкой
 // #define USE_STATIC_COLOR_IN_SLEEP     // если не закомментировано, во сне используется постоянный цвет
 #define USE_SIN_CURVE                        // если не закомментировано, во сне используется более резкая смена яркости
 #define USE_FAST_CHANGE_WORK_OR_GAME_MOGE 0  // 1 - использовать более быструю смену режимов, 0 - нет
-#define BRIGHT_BACKLIGHT_IN_GAME_MODE 30
-#define BRIGHT_BACKLIGHT_IN_WORK_MODE 80
+#define BRIGHT_BACKLIGHT_IN_GAME_MODE 50
+#define BRIGHT_BACKLIGHT_IN_WORK_MODE 90
+#define MIN_PHOTORESISTOR_VAL 250
+#define MAX_PHOTORESISTOR_VAL 600
+#define MIN_REGULATED_BRFIGHT_LEVEL 40
+#define MAX_REGULATED_BRFIGHT_LEVEL 255
 
 // Invisible
 #define LIGHT_CYCLE 15     // частота обновления светодиодов 60 герц
@@ -70,8 +75,8 @@ TimerMs delayBetweenCheckBusyTimer(5000, 1, 1);                       // что�
 TimerMs updateInSleepModeTimer(PERIOD_BREATH_IN_SLEEP / 255, 1, 0);   // когда в режиме сна
 TimerMs dropRxLEDSleepTimer(5000, 0, 1);                              // сброс некрасивого красного светодиода при отправке компа в сон
 TimerMs alwaysOnModeTimer(PERIOD_MOUSE_SHAKE, 0, 0);                  // режим дёрганья мышкой
-TimerMs countWorkTimeTimer(60*1000, 1, 0);                  // счётчик времени работы
-TimerMs timeoutEnablePIRTimer(10*60*1000, 0, 1);               
+TimerMs countWorkTimeTimer(60*1000, 1, 0);                            // счётчик времени работы
+TimerMs timeoutEnablePIRTimer(TIMEOUT_TO_ENABLE_PIR, 0, 1);               
 
 // Связь с компом
 #define HID_CUSTOM_LAYOUT
@@ -162,6 +167,10 @@ int anti_scr_led1 = 0;   // для антидребезга
 int anti_scr_led2 = 0;
 bool delay_between_check_busy = 1;  // чтобы сильно часто не дёргать таймер таймаута
 bool is_turned_wheel = 0;           // для корректрой обработки мультимедиа команд
+volatile bool onPressButton1InInterruptFlag = 0;
+volatile bool onReleaseButton1InInterruptFlag = 0;
+volatile bool onPressButton2InInterruptFlag = 0;
+volatile bool onReleaseButton2InInterruptFlag = 0;
 
 // остальное
 bool in_scroll_page_mode = 0;  // для режима прокрутки страницы
@@ -173,6 +182,7 @@ int light_led1 = 0;  // яркость светодиода кнопки
 int light_led2 = 0;
 int light_wheel = 1;            // яркость колёсика
 bool last_direction_wheel = 0;  // последнее направление поворота
+int autobright_level = 0;  // для автояркости
 
 bool light_on_led1 = 0;  // флаг, нужно включить светодиод один раз при нажатии
 bool light_on_led2 = 0;
@@ -187,6 +197,7 @@ byte pc_in_sleep_light = 0;
 byte pc_in_sleep_color = 0;
 bool state_back_light = 0;  // состояние задней подсветки для плавной смены - 0 - game mode, 1 - work mode
 byte BRIGHT_BACKLIGHT = 255;
+byte BRIGHT_PHOTOREZ = 255;
 byte BRIGHT_WHEEL = 255;
 byte BRIGHT_BUTTONS = 255;
 byte BRIGHT_BPM = 255;

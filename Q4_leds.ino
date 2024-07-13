@@ -51,7 +51,7 @@ void updateBackLight() {
       // градиент будет брать значение шума, размер градиента 255 (как максимум шума)
       // i*50 - шаг шума по горизонтали
       // noise_position - общее движение шума по вертикали
-      strip.leds[i] = getFade(blueGrad.get(inoise8(i * 50, noise_position[i]), 255), 255 - BRIGHT_BACKLIGHT_IN_GAME_MODE * BRIGHT_BACKLIGHT / 255);
+      strip.leds[i] = getFade(blueGrad.get(inoise8(i * 50, noise_position[i]), 255), 255 - BRIGHT_BACKLIGHT_IN_GAME_MODE * BRIGHT_BACKLIGHT / 255 * BRIGHT_PHOTOREZ / 255);
       noise_position[i] += 3;
     }
   } else {
@@ -64,7 +64,7 @@ void updateBackLight() {
         // noise_position - общее движение шума по вертикали
         strip.leds[!x and y == 0 ? 2 : !x and y ? 3
                                      : x and y  ? 0
-                                                : 1] = getFade(fireGrad.get(inoise8(x * 50 * 3, y * 40 * 3, noise_position[0]), 255), 255 - BRIGHT_BACKLIGHT_IN_WORK_MODE * BRIGHT_BACKLIGHT / 255);
+                                                : 1] = getFade(fireGrad.get(inoise8(x * 50 * 3, y * 40 * 3, noise_position[0]), 255), 255 - BRIGHT_BACKLIGHT_IN_WORK_MODE * BRIGHT_BACKLIGHT / 255 * BRIGHT_PHOTOREZ / 255);
         noise_position[0] += 1;
       }
     }
@@ -110,6 +110,19 @@ void updateKeys() {
     upd2 = 1;
   }
 
-  if (upd1) strip.leds[4] = getFade(colorTap1, 255 - light_led1 * BRIGHT_BUTTONS / 255);
-  if (upd2) strip.leds[5] = getFade(colorTap2, 255 - light_led2 * BRIGHT_BUTTONS / 255);
+  if (upd1) strip.leds[4] = getFade(colorTap1, 255 - light_led1 * BRIGHT_BUTTONS / 255 * BRIGHT_PHOTOREZ / 255);
+  if (upd2) strip.leds[5] = getFade(colorTap2, 255 - light_led2 * BRIGHT_BUTTONS / 255 * BRIGHT_PHOTOREZ / 255);
+}
+
+void updateAutoBright() {
+  int prev = autobright_level;
+  static int last_photores_val = 0;
+  if (!light_led1 and !light_led2) last_photores_val = analogRead(A2);
+  autobright_level = (31 * autobright_level + 1 * last_photores_val) >> 5;
+  if (prev != autobright_level) BRIGHT_PHOTOREZ = constrain(map(autobright_level, MIN_PHOTORESISTOR_VAL, MAX_PHOTORESISTOR_VAL, MIN_REGULATED_BRFIGHT_LEVEL, MAX_REGULATED_BRFIGHT_LEVEL), MIN_REGULATED_BRFIGHT_LEVEL, MAX_REGULATED_BRFIGHT_LEVEL);
+  // Serial.print(prev);
+  // Serial.print(" ");
+  //   Serial.print(analogRead(A2));
+  // Serial.print(" ");
+  // Serial.println(BRIGHT_PHOTOREZ);  // photores
 }

@@ -1,9 +1,9 @@
 void loop() {
   // Serial.print(analogRead(A1));
   // Serial.print(" ");
-  // Serial.print(analogRead(A2));  // photores
+  // Serial.print(analogRead(A3));  // pir
   // Serial.print(" ");
-  // Serial.println(digitalRead(A3));  // pir
+  // Serial.println(analogRead(A2));  // photores
   KeysHandlerInGameMode();
   if (mainCycleTimer.tick()) {
     ticksActions();
@@ -22,6 +22,7 @@ void loop() {
       updateBackLight();
       updateBPMFlash();
       updateAlwaysOnMode();
+      updateAutoBright();
       strip.show();  // вывод
     }
   }

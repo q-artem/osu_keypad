@@ -66,6 +66,12 @@ void resetTimeout() {
 
 void disablingLight() {  // привязана attach к timeoutDisableTimer
   is_pc_in_sleep = 1;
+
+  byte old_bright_photorez = BRIGHT_PHOTOREZ;
+  BRIGHT_PHOTOREZ = 255;  // красивая вспышка
+  updateBackLight();
+  BRIGHT_PHOTOREZ = old_bright_photorez;
+
   for (int i = global_britness; i > -1; --i) {
     strip.setBrightness(i);  // ну да, костыль
     strip.show();            // вывод
@@ -231,28 +237,7 @@ void printStatistics() {
   delay(650);
   Keyboard.print(F("\n"));
   delay(650);
-  Keyboard.print(F("|------------------------+------------|\n"));
-  delay(650);
-  Keyboard.print(F("|        Значение        | Количество |\n"));
-  delay(650);
-  Keyboard.print(F("|------------------------+------------|\n"));
-  delay(650);
-  Keyboard.print(F("| Разблокировок ПК, раз  |            |\n"));
-  delay(650);
-  Keyboard.print(F("| Блокировок ПК, раз     |            |\n"));
-  delay(650);
-  Keyboard.print(F("| Отправок ПК в сон, раз |            |\n"));
-  delay(650);
-  Keyboard.print(F("| Выводов стат., раз     |            |\n"));
-  delay(650);
-  Keyboard.print(F("|------------------------+------------|\n"));
-  delay(650);
-  Keyboard.print(F("\n"));
-  delay(650);
-  Keyboard.print(F("                        Время работы\n"));
-  delay(650);
-  Keyboard.print(F("\n"));
-  delay(650);
+
   // Keyboard.print(F("|-----------------------------+-----------------------------|\n"));
   //  delay(650);
   // Keyboard.print(F("|            Режим            |         Время работы        |\n"));
