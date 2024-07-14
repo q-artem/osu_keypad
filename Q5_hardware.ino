@@ -165,11 +165,9 @@ void funcButtomHandler() {
     }
   }
   if (func_btn.hasClicks(3)) {  // включаем режим дёрганья мышью
-    if (!IN_GAME_MODE) {
       isInAlwaysOnMode = !isInAlwaysOnMode;
       if (isInAlwaysOnMode) alwaysOnModeTimer.start();
       else alwaysOnModeTimer.stop();
-    }
   }
   if (func_btn.hasClicks(4)) {
     data.in_game_keys_mode = !data.in_game_keys_mode;

@@ -14,17 +14,17 @@
 #define gradientBackColor2 mAqua
 #define gradientBackColor3 mBlue
 #define gradientBackColor4 mNavy
-#define TIMEOUT_TO_DISABLE 60*60*1000L             // таймаут до отключения подстветки
-#define TIMEOUT_TO_ENABLE_PIR 60*10*1000L       // таймаут до активации включения по движению, после уходв в сон или выкючения по тайауту
-#define TIME_DISABLING_LIGHT 500         // как долго будет отключаться подстветка
-#define TIME_ENABLING_LIGHT 300          // как долго будет включаться подстветка
-#define TIMEOUT_INACTION_DISABLE_BPM 30  // как долго будет уменьшаться яроксть светодиода BPM при бездействии
-#define PERIOD_BREATH_IN_SLEEP 4000      // период эффекта дыхания когда комп во сне
-#define BRIGHT_BREATH_IN_SLEEP 30        // разница между максимальной и минимальной яркостью эффекта дыхания когда комп во сне
-#define MIN_BRIGHT_BREATH_IN_SLEEP 3     // минимальная яркость эффекта дыхания когда комп во сне
-#define COLOR_BREATH_IN_SLEEP mGreen     // цвет эффекта дыхания когда комп во сне
-#define PERIOD_MOUSE_SHAKE 30000L         // период дёрганья мыши
-#define BRIGHT_LED_IN_ALWAYS_ON_MODE  170  // яркость в режиме дёрганья мышкой
+#define TIMEOUT_TO_DISABLE 60 * 60 * 1000L     // таймаут до отключения подстветки
+#define TIMEOUT_TO_ENABLE_PIR 60 * 10 * 1000L  // таймаут до активации включения по движению, после уходв в сон или выкючения по тайауту
+#define TIME_DISABLING_LIGHT 500               // как долго будет отключаться подстветка
+#define TIME_ENABLING_LIGHT 300                // как долго будет включаться подстветка
+#define TIMEOUT_INACTION_DISABLE_BPM 30        // как долго будет уменьшаться яроксть светодиода BPM при бездействии
+#define PERIOD_BREATH_IN_SLEEP 4000            // период эффекта дыхания когда комп во сне
+#define BRIGHT_BREATH_IN_SLEEP 30              // разница между максимальной и минимальной яркостью эффекта дыхания когда комп во сне
+#define MIN_BRIGHT_BREATH_IN_SLEEP 3           // минимальная яркость эффекта дыхания когда комп во сне
+#define COLOR_BREATH_IN_SLEEP mGreen           // цвет эффекта дыхания когда комп во сне
+#define PERIOD_MOUSE_SHAKE 30000L              // период дёрганья мыши
+#define BRIGHT_LED_IN_ALWAYS_ON_MODE 170       // яркость в режиме дёрганья мышкой
 // #define USE_STATIC_COLOR_IN_SLEEP     // если не закомментировано, во сне используется постоянный цвет
 #define USE_SIN_CURVE                        // если не закомментировано, во сне используется более резкая смена яркости
 #define USE_FAST_CHANGE_WORK_OR_GAME_MOGE 0  // 1 - использовать более быструю смену режимов, 0 - нет
@@ -66,8 +66,8 @@ VirtButton btn_1_and_2;                // одновременное нажат�
 
 // Таймеры
 #include <TimerMs.h>
-TimerMs mainCycleTimer(MAIN_CYCLE, 1, 0);
-TimerMs lightCycleTimer(LIGHT_CYCLE, 1, 0);
+TimerMs mainCycleTimer(MAIN_CYCLE, 1, 0);                             // основной цикл
+TimerMs lightCycleTimer(LIGHT_CYCLE, 1, 0);                           // обновление подсветки
 TimerMs timeoutDisableTimer(TIMEOUT_TO_DISABLE, 1, 1);                // время до выключения подстветки
 TimerMs inactionDisableBPMTimer(TIMEOUT_INACTION_DISABLE_BPM, 1, 0);  // время полного погасания светодиода BPM
 TimerMs upBritnessAfterDisableTimer(1, 0, 0);                         // таймер для асинхронного повышения яркости         (заменить на главный цикл?)
@@ -75,8 +75,8 @@ TimerMs delayBetweenCheckBusyTimer(5000, 1, 1);                       // что�
 TimerMs updateInSleepModeTimer(PERIOD_BREATH_IN_SLEEP / 255, 1, 0);   // когда в режиме сна
 TimerMs dropRxLEDSleepTimer(5000, 0, 1);                              // сброс некрасивого красного светодиода при отправке компа в сон
 TimerMs alwaysOnModeTimer(PERIOD_MOUSE_SHAKE, 0, 0);                  // режим дёрганья мышкой
-TimerMs countWorkTimeTimer(60*1000, 1, 0);                            // счётчик времени работы
-TimerMs timeoutEnablePIRTimer(TIMEOUT_TO_ENABLE_PIR, 0, 1);               
+TimerMs countWorkTimeTimer(60 * 1000, 1, 0);                          // счётчик времени работы
+TimerMs timeoutEnablePIRTimer(TIMEOUT_TO_ENABLE_PIR, 0, 1);           // таймаут до включения пир после выключения подсветки
 
 // Связь с компом
 #define HID_CUSTOM_LAYOUT
@@ -95,13 +95,13 @@ struct Data {
   uint32_t clicks_wheel_up_in_game = 0;
   uint32_t clicks_wheel_down_in_work = 0;
   uint32_t clicks_wheel_up_in_work = 0;
-  
+
   uint32_t clicks_func_btn = 0;
   uint32_t clicks_func_btn_unlock_pc = 0;
   uint32_t clicks_lock_pc = 0;
   uint32_t clicks_sleep_pc = 0;
   uint32_t show_statistics_amount = 0;
-  
+
   uint32_t all_work_time = 0;  // в минутах
   uint32_t all_game_time = 0;
   uint32_t all_sleep_time = 0;
@@ -141,7 +141,7 @@ struct Data {
   int int_param_8 = 0;
   int int_param_9 = 0;
   int int_param_10 = 0;
-  
+
   uint32_t new_param_1 = 0;
   uint32_t new_param_2 = 0;
   uint32_t new_param_3 = 0;
@@ -182,7 +182,7 @@ int light_led1 = 0;  // яркость светодиода кнопки
 int light_led2 = 0;
 int light_wheel = 1;            // яркость колёсика
 bool last_direction_wheel = 0;  // последнее направление поворота
-int autobright_level = 0;  // для автояркости
+int autobright_level = 0;       // для автояркости
 
 bool light_on_led1 = 0;  // флаг, нужно включить светодиод один раз при нажатии
 bool light_on_led2 = 0;

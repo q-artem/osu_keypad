@@ -55,7 +55,7 @@ void ticksActions() {
 
 void resetTimeoutActions() {
   if (delay_between_check_busy) {
-    if (btn_1.busy() or btn_2.busy() or func_btn.busy() or light_wheel or (is_pc_in_sleep == 0 and digitalRead(A3))) {  // когда поворачиваем энкодер - light_wheel становится не 0, или когда пир кого то видит // это не надо  or tumbler_first_btn.release() or tumbler_second_btn.release()
+    if (btn_1.busy() or btn_2.busy() or func_btn.busy() or light_wheel or (is_pc_in_sleep == 0 and digitalRead(A3) and !isInAlwaysOnMode)) {  // когда поворачиваем энкодер - light_wheel становится не 0, или когда пир кого то видит но не дёрганье мышкой // это не надо  or tumbler_first_btn.release() or tumbler_second_btn.release()
       resetTimeout();                                                      // сброс таймаута
       delay_between_check_busy = 0;
       delayBetweenCheckBusyTimer.start();  // ждём следующую возможность сбросить таймаут
