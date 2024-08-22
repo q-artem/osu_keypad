@@ -118,7 +118,7 @@ void SensorKeysHandler() {
     }
     onReleaseButton2InInterruptFlag = 1;
   }
-aasssaasasaaaaaaaaaaaaaaassssssssssssssaaassssss
+
   if (!b1_flag_sensor and digitalRead(A0) and !anti_scr_led1) {
     b1_flag_sensor = 1;
     if (IN_GAME_MODE) {
