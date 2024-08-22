@@ -60,8 +60,8 @@ EncButton eb(7, 8, 11, INPUT_PULLUP);  // колёсико
 Button func_btn(14);                   // функциональная кнопка
 VirtButton tumbler_first_btn;          // тумблер
 VirtButton tumbler_second_btn;         // тумблер
-Button btn_1(3);                       // кнопка 1
-Button btn_2(2);                       // кнопка 2
+VirtButton btn_1;                       // кнопка 1
+VirtButton btn_2;                       // кнопка 2
 VirtButton btn_1_and_2;                // одновременное нажатие 1 и 2 кнопок
 
 // Таймеры
@@ -162,6 +162,8 @@ bool IN_GAME_MODE = 0;
 // обработка кнопок
 bool b1_flag = 0;  // флаги для нажатий
 bool b2_flag = 0;
+bool b1_flag_sensor = 0;  // флаги для нажатий
+bool b2_flag_sensor = 0;
 bool if_click_todo = 0;  // если идёт нажатие
 int anti_scr_led1 = 0;   // для антидребезга
 int anti_scr_led2 = 0;

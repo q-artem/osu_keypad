@@ -34,8 +34,8 @@ void ticksActions() {
   func_btn.tick();            //
   tumbler_first_btn.tick(digitalRead(10));   //
   tumbler_second_btn.tick(!digitalRead(10));  //
-  btn_1.tick();
-  btn_2.tick();
+  btn_1.tick(!digitalRead(3) or digitalRead(A0));
+  btn_2.tick(!digitalRead(2) or digitalRead(A1));
   btn_1_and_2.tick(btn_1, btn_2);
   // таймеры
   //  mainCycleTimer.tick();  // опрашивается в условии в loop

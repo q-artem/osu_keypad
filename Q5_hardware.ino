@@ -102,6 +102,40 @@ void KeysHandlerInGameMode() {
   }
 }
 
+void SensorKeysHandler() {
+  if (!b2_flag_sensor and digitalRead(A1) and !anti_scr_led2) {
+    b2_flag_sensor = 1;
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.press('s');
+      else Mouse.press(MOUSE_RIGHT);
+    }
+    onPressButton2InInterruptFlag = 1;
+  } else if (b2_flag_sensor and !digitalRead(A1)) {
+    b2_flag_sensor = 0;
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.release('s');
+      else Mouse.release(MOUSE_RIGHT);
+    }
+    onReleaseButton2InInterruptFlag = 1;
+  }
+aasssaasasaaaaaaaaaaaaaaassssssssssssssaaassssss
+  if (!b1_flag_sensor and digitalRead(A0) and !anti_scr_led1) {
+    b1_flag_sensor = 1;
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.press('a');
+      else Mouse.press(MOUSE_LEFT);
+    }
+    onPressButton1InInterruptFlag = 1;
+  } else if (b1_flag_sensor and !digitalRead(A0)) {
+    b1_flag_sensor = 0;
+    if (IN_GAME_MODE) {
+      if (data.in_game_keys_mode) Keyboard.release('a');
+      else Mouse.release(MOUSE_LEFT);
+    }
+    onReleaseButton1InInterruptFlag = 1;
+  }
+}
+
 void interruptButton1Handler() {
   if (!b1_flag and !digitalRead(3) and !anti_scr_led1) {
     if (IN_GAME_MODE) {
@@ -165,9 +199,9 @@ void funcButtomHandler() {
     }
   }
   if (func_btn.hasClicks(3)) {  // включаем режим дёрганья мышью
-      isInAlwaysOnMode = !isInAlwaysOnMode;
-      if (isInAlwaysOnMode) alwaysOnModeTimer.start();
-      else alwaysOnModeTimer.stop();
+    isInAlwaysOnMode = !isInAlwaysOnMode;
+    if (isInAlwaysOnMode) alwaysOnModeTimer.start();
+    else alwaysOnModeTimer.stop();
   }
   if (func_btn.hasClicks(4)) {
     data.in_game_keys_mode = !data.in_game_keys_mode;

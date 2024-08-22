@@ -40,9 +40,9 @@ void setup() {
   btn_1_and_2.setClickTimeout(330);
   btn_1_and_2.setHoldTimeout(300);
   btn_1_and_2.setDebTimeout(34);
-  // функциональная кнопка
-  pinMode(A0, OUTPUT);  // подтяжка
-  digitalWrite(A0, 0);
+  // сенсорные кнопки
+  pinMode(A0, INPUT_PULLUP);  // подтяжка
+  pinMode(A1, INPUT_PULLUP);  // подтяжка
   // тумблер
   pinMode(16, OUTPUT);  // подтяжка
   digitalWrite(16, 0);
